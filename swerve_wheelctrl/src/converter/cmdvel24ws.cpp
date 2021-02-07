@@ -4,7 +4,7 @@
 VelConverter::VelConverter(ros::NodeHandle &nh, const float &body_width, const int &lost_time_threshold, const int &loop_rate) 
 : nh_(nh), BODY_WIDTH(body_width), lost_time_threshold_(lost_time_threshold), loop_rate_(loop_rate)
 { //constructer, define pubsub
-    ROS_INFO("Creating wheelctrl_4ws");
+    ROS_INFO("Creating swerve_wheelctrl");
     ROS_INFO_STREAM("body_width [m]: " << BODY_WIDTH);
     ROS_INFO_STREAM("lost_time_threshold [ms]: " << lost_time_threshold_);
     ROS_INFO_STREAM("loop_rate [Hz]: " << loop_rate_);
@@ -114,7 +114,7 @@ void VelConverter::cmdvel24ws(){
 }
 
 void VelConverter::reset(){
-    ROS_ERROR("wheelctrl_4ws: unable to subscribe topics. Reset velocity...");
+    ROS_ERROR("swerve_wheelctrl: unable to subscribe topics. Reset velocity...");
     for (int i = 0; i < 4; i++) {
         target_speed[i] = 0;
         // reset velovity, sustain theta
