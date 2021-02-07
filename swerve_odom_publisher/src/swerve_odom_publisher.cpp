@@ -90,7 +90,7 @@ void Swerve_Odom_Publisher::CalcRobotAngle()
 
     // 第一象限に存在する点がただ一つ存在する
     for (int i = 0; i < 4;i++){
-        if (square_pos[i][0] >= 0 && square_pos[i][1] >= 0){
+        if (square_pos[i][0] > 0 && square_pos[i][1] >= 0){
             index = i;
             break;
         }
