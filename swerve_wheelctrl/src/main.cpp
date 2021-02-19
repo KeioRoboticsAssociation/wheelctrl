@@ -1,7 +1,7 @@
 #include <ros/ros.h>
 #include "cmdvel24ws.h"
 
-std::string node_name = "wheelctrl_4ws";
+std::string node_name = "swerve_wheelctrl";
 
 int main(int argc, char **argv)
 {
