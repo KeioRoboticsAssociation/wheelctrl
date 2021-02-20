@@ -1,4 +1,4 @@
-#include "swerve_odom_publisher.h"
+#include "swerve_odom_publisher/swerve_odom_publisher.h"
 
 std::string node_name = "swerve_odom_publisher";
 
@@ -19,8 +19,8 @@ Swerve_Odom_Publisher::Swerve_Odom_Publisher(ros::NodeHandle &nh, const int &loo
 
     for (int i = 0; i < 4; i++)
     {
-        wheelpos[i][0] = BODY_WIDTH / sqrt(2) * cos(PI * (2 * i + 1) / 4);
-        wheelpos[i][1] = BODY_WIDTH / sqrt(2) * sin(PI * (2 * i + 1) / 4);
+        wheelpos[i][0] = BODY_WIDTH / sqrt(2) * cos(M_PI * (2 * i + 1) / 4);
+        wheelpos[i][1] = BODY_WIDTH / sqrt(2) * sin(M_PI * (2 * i + 1) / 4);
     }
 
     update();
@@ -104,19 +104,19 @@ void Swerve_Odom_Publisher::CalcRobotAngle()
 
         if(count == 0) // 第1象限
         {
-            theta += atan2(y, x) - 45.0f * PI / 180.0f;
+            theta += atan2(y, x) - 45.0f * M_PI / 180.0f;
         }
         else if (count == 1) // 第2象限
         {
-            theta += atan2(y, x) - 135.0f * PI / 180.0f;
+            theta += atan2(y, x) - 135.0f * M_PI / 180.0f;
         }
         else if (count == 2) // 第3象限
         {
-            theta += atan2(y, x) + 135.0f * PI / 180.0f;
+            theta += atan2(y, x) + 135.0f * M_PI / 180.0f;
         }
         else if (count == 3) // 第4象限
         {
-            theta += atan2(y, x) + 45.0f * PI / 180.0f;
+            theta += atan2(y, x) + 45.0f * M_PI / 180.0f;
         }
 
         index++;
@@ -137,15 +137,15 @@ void Swerve_Odom_Publisher::CalcRobotAngle()
     if (square_pos[0][0] > 0 && square_pos[0][1] >= 0); // 第1象限
     else if (square_pos[0][0] <= 0 && square_pos[0][1] > 0) // 第2象限
     {
-        theta += 90.0f * PI / 180.0f;
+        theta += 90.0f * M_PI / 180.0f;
     }
     else if (square_pos[0][0] < 0 && square_pos[0][1] <= 0) // 第3象限
     {
-        theta -= 180.0f * PI / 180.0f;
+        theta -= 180.0f * M_PI / 180.0f;
     }
     else if (square_pos[0][0] >= 0 && square_pos[0][1] < 0) // 第4象限
     {
-        theta -= 90.0f * PI / 180.0f;
+        theta -= 90.0f * M_PI / 180.0f;
     }
 }
 
@@ -187,10 +187,14 @@ void Swerve_Odom_Publisher::update()
         odom.pose.pose.orientation = odom_quat;
 
         //set the velocity
+        static ros::Time last_time = ros::Time::now();
+        current_time = ros::Time::now();
+        float delta_t = (current_time - last_time).toSec();
         odom.child_frame_id = base_frame_id_;
-        odom.twist.twist.linear.x = (center_xy[0] - old_center_xy[0]) * (float)loop_rate_;
-        odom.twist.twist.linear.y = (center_xy[1] - old_center_xy[1]) * (float)loop_rate_;
-        odom.twist.twist.angular.z = (theta - old_theta) * (float)loop_rate_;
+        odom.twist.twist.linear.x = (center_xy[0] - old_center_xy[0]) / delta_t;
+        odom.twist.twist.linear.y = (center_xy[1] - old_center_xy[1]) / delta_t;
+        odom.twist.twist.angular.z = (theta - old_theta) / delta_t;
+        last_time = current_time;
 
         //publish the message
         odom_pub.publish(odom);
