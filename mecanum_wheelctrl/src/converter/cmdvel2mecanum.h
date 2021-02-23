@@ -6,12 +6,13 @@
 #include <chrono>
 
 #include <std_msgs/Float32MultiArray.h>
+#include <std_msgs/Float64.h>
 #include <geometry_msgs/Twist.h>
 
 class VelConverter
 {
 public:
-    VelConverter(ros::NodeHandle &nh, const float &body_height, const float &body_width, const int &lost_time_threshold, const int &loop_rate);
+    VelConverter(ros::NodeHandle &nh, const float &body_height, const float &body_width, const int &lost_time_threshold, const int &loop_rate, const bool &gazebo_mode);
     ~VelConverter(){};
 
 private:
@@ -29,6 +30,7 @@ private:
     float BODY_HEIGHT;
     float BODY_WIDTH;
     int lost_time_threshold_;
+    bool gazebo_mode_;
 
     //variables
     float vx;

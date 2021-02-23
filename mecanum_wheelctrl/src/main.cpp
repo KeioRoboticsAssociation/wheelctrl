@@ -20,11 +20,14 @@ int main(int argc, char **argv)
     float body_height = 0.440;
     float body_width = 0.440;
     int lost_time_threshold = 500;
+    bool gazebo_mode = false;
+
     pnh.getParam("control_frequency", loop_rate);
     pnh.getParam("lost_time_threshold", lost_time_threshold);
     pnh.getParam("body_height", body_height);
     pnh.getParam("body_width", body_width);
+    pnh.getParam("gazebo_mode", gazebo_mode);
 
-    VelConverter converter(nh, body_height, body_width, lost_time_threshold, loop_rate);
+    VelConverter converter(nh, body_height, body_width, lost_time_threshold, loop_rate, gazebo_mode);
     return 0;
 }

@@ -69,8 +69,8 @@ void Mecanum_Odom_Publisher::update()
     {
         float a = BODY_WIDTH / 2.0;
         float b = BODY_HEIGHT / 2.0;
-        vx = (-wheel_speed[0] + wheel_speed[1] - wheel_speed[2] + wheel_speed[3]) / 4.0;
-        vy = (wheel_speed[0] + wheel_speed[1] + wheel_speed[2] + wheel_speed[3]) / 4.0;
+        vx = (wheel_speed[0] + wheel_speed[1] + wheel_speed[2] + wheel_speed[3]) / 4.0;
+        vy = (wheel_speed[0] - wheel_speed[1] + wheel_speed[2] - wheel_speed[3]) / 4.0;
         omega = (wheel_speed[0] - wheel_speed[1] - wheel_speed[2] + wheel_speed[3]) / 4.0 / (a+b);
 
         static ros::Time last_time = ros::Time::now();
