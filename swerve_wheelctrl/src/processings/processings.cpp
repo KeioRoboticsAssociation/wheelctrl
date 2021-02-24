@@ -1,35 +1,35 @@
 #include "processings.h"
 
 namespace processings {
-    void PI2INF(float &angle, const float &former_angle)
+    void PI2INF(double &angle, const double &former_angle)
     {
-        if (former_angle - angle > PI){
-            while (abs(former_angle - angle) > PI)
+        if (former_angle - angle > M_PI){
+            while (abs(former_angle - angle) > M_PI)
             {
-                angle += 2 * PI;
+                angle += 2 * M_PI;
             }
         }
-        else if (former_angle - angle < -1*PI)
+        else if (former_angle - angle < -1*M_PI)
         {
-            while (abs(former_angle - angle) > PI)
+            while (abs(former_angle - angle) > M_PI)
             {
-                angle -= 2 * PI;
+                angle -= 2 * M_PI;
             }
         }
     }
 
-    void AdjustDirection(float &angle, const float &former_angle, int &speed_flag)
+    void AdjustDirection(double &angle, const double &former_angle, int &speed_flag)
     {
-        if (former_angle - angle > 1e-7f)
+        if (former_angle - angle > 1e-3f)
         {
-            if (former_angle - angle < PI / 2.0f)
+            if (former_angle - angle < M_PI / 2.0f)
             {
                 if (speed_flag == -1)
                     speed_flag *= -1;
             }
-            else if (former_angle - angle > PI / 2.0f)
+            else if (former_angle - angle > M_PI / 2.0f)
             {
-                angle += PI;
+                angle += M_PI;
                 if (speed_flag == 1)
                     speed_flag *= -1;
             }
@@ -40,16 +40,16 @@ namespace processings {
                     speed_flag *= -1;
             }
         }
-        else if (former_angle - angle < -1e-7f)
+        else if (former_angle - angle < -1.0 * 1e-3f)
         {
-            if (former_angle - angle > -1 * PI / 2.0f)
+            if (former_angle - angle > -1.0 * M_PI / 2.0f)
             {
                 if (speed_flag == -1)
                     speed_flag *= -1;
             }
-            else if (former_angle - angle < -1 * PI / 2.0f)
+            else if (former_angle - angle < -1.0 * M_PI / 2.0f)
             {
-                angle -= PI;
+                angle -= M_PI;
                 if (speed_flag == 1)
                     speed_flag *= -1;
             }

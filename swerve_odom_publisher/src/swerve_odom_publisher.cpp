@@ -2,20 +2,27 @@
 
 std::string node_name = "swerve_odom_publisher";
 
-Swerve_Odom_Publisher::Swerve_Odom_Publisher(ros::NodeHandle &nh, const int &loop_rate, const float &body_width, const std::string &base_frame_id)
-    : nh_(nh), loop_rate_(loop_rate), BODY_WIDTH(body_width), base_frame_id_(base_frame_id)
+Swerve_Odom_Publisher::Swerve_Odom_Publisher(ros::NodeHandle &nh, const int &loop_rate, const double &body_width, const std::string &base_frame_id, const bool &gazebo_mode)
+    : nh_(nh), loop_rate_(loop_rate), BODY_WIDTH(body_width), base_frame_id_(base_frame_id), gazebo_mode_(gazebo_mode)
 { //constructer, define pubsub
     ROS_INFO("Creating swerve_odom_publisher");
     ROS_INFO_STREAM("loop_rate [Hz]: " << loop_rate_);
     ROS_INFO_STREAM("body_width [m]: " << BODY_WIDTH);
     ROS_INFO_STREAM("base_frame_id: " << base_frame_id_);
+    ROS_INFO_STREAM("gazebo_mode: " << gazebo_mode_);
 
     odom_pub = nh_.advertise<nav_msgs::Odometry>("odom", 1);
-    sub_RF = nh_.subscribe("data_RF", 1, &Swerve_Odom_Publisher::RF_Callback, this);
-    sub_LF = nh_.subscribe("data_LF", 1, &Swerve_Odom_Publisher::LF_Callback, this);
-    sub_LB = nh_.subscribe("data_LB", 1, &Swerve_Odom_Publisher::LB_Callback, this);
-    sub_RB = nh_.subscribe("data_RB", 1, &Swerve_Odom_Publisher::RB_Callback, this);
-    // Float32MultiArray data[2]; data[0]=v, data[1]=theta
+    bno_sub = nh_.subscribe("imu", 1, &Swerve_Odom_Publisher::imuCallback, this);
+    if(gazebo_mode_){
+        sub_state_gazebo = nh_.subscribe("/simple_swerve/joint_states", 1, &Swerve_Odom_Publisher::state_gazebo_Callback, this);
+    }
+    else{
+        sub_RF = nh_.subscribe("data_RF", 1, &Swerve_Odom_Publisher::RF_Callback, this);
+        sub_LF = nh_.subscribe("data_LF", 1, &Swerve_Odom_Publisher::LF_Callback, this);
+        sub_LB = nh_.subscribe("data_LB", 1, &Swerve_Odom_Publisher::LB_Callback, this);
+        sub_RB = nh_.subscribe("data_RB", 1, &Swerve_Odom_Publisher::RB_Callback, this);
+        // Float32MultiArray data[2]; data[0]=v, data[1]=theta
+    }
 
     for (int i = 0; i < 4; i++)
     {
@@ -26,13 +33,28 @@ Swerve_Odom_Publisher::Swerve_Odom_Publisher(ros::NodeHandle &nh, const int &loo
     update();
 }
 
+void Swerve_Odom_Publisher::geometry_quat_to_rpy(double &roll, double &pitch, double &yaw, geometry_msgs::Quaternion geometry_quat)
+{
+    tf::Quaternion quat;
+    quaternionMsgToTF(geometry_quat, quat);
+    tf::Matrix3x3(quat).getRPY(roll, pitch, yaw); //rpy are Passed by Reference
+}
+
+void Swerve_Odom_Publisher::imuCallback(const sensor_msgs::Imu::ConstPtr &imu)
+{
+    double roll, pitch, yaw;
+    geometry_quat_to_rpy(roll, pitch, yaw, imu->orientation);
+    theta = yaw;
+    //ROS_INFO("%f", body_theta*180.0/M_PI);
+}
+
 void Swerve_Odom_Publisher::RF_Callback(const std_msgs::Float32MultiArray::ConstPtr &msg)
 {
     static ros::Time last_time = ros::Time::now();
     ros::Time current_time = ros::Time::now();
-    float delta = msg->data[0] * (current_time - last_time).toSec();
-    wheelpos[0][0] -= delta * sin(msg->data[1]);
-    wheelpos[0][1] += delta * cos(msg->data[1]);
+    double delta = msg->data[0] * (current_time - last_time).toSec();
+    wheelpos[0][0] += delta * cos(msg->data[1]);
+    wheelpos[0][1] += delta * sin(msg->data[1]);
     last_time = current_time;
 }
 
@@ -40,9 +62,9 @@ void Swerve_Odom_Publisher::LF_Callback(const std_msgs::Float32MultiArray::Const
 {
     static ros::Time last_time = ros::Time::now();
     ros::Time current_time = ros::Time::now();
-    float delta = msg->data[0] * (current_time - last_time).toSec();
-    wheelpos[1][0] -= delta * sin(msg->data[1]);
-    wheelpos[1][1] += delta * cos(msg->data[1]);
+    double delta = msg->data[0] * (current_time - last_time).toSec();
+    wheelpos[1][0] += delta * cos(msg->data[1]);
+    wheelpos[1][1] += delta * sin(msg->data[1]);
     last_time = current_time;
 }
 
@@ -50,9 +72,9 @@ void Swerve_Odom_Publisher::LB_Callback(const std_msgs::Float32MultiArray::Const
 {
     static ros::Time last_time = ros::Time::now();
     ros::Time current_time = ros::Time::now();
-    float delta = msg->data[0] * (current_time - last_time).toSec();
-    wheelpos[2][0] -= delta * sin(msg->data[1]);
-    wheelpos[2][1] += delta * cos(msg->data[1]);
+    double delta = msg->data[0] * (current_time - last_time).toSec();
+    wheelpos[2][0] += delta * cos(msg->data[1]);
+    wheelpos[2][1] += delta * sin(msg->data[1]);
     last_time = current_time;
 }
 
@@ -60,93 +82,55 @@ void Swerve_Odom_Publisher::RB_Callback(const std_msgs::Float32MultiArray::Const
 {
     static ros::Time last_time = ros::Time::now();
     ros::Time current_time = ros::Time::now();
-    float delta = msg->data[0] * (current_time - last_time).toSec();
-    wheelpos[3][0] -= delta * sin(msg->data[1]);
-    wheelpos[3][1] += delta * cos(msg->data[1]);
+    double delta = msg->data[0] * (current_time - last_time).toSec();
+    wheelpos[3][0] += delta * cos(msg->data[1]);
+    wheelpos[3][1] += delta * sin(msg->data[1]);
+    last_time = current_time;
+}
+
+void Swerve_Odom_Publisher::state_gazebo_Callback(const sensor_msgs::JointState::ConstPtr &msg)
+{
+    gazebo_LB_vel = msg->velocity[1] * 0.035;
+    gazebo_LF_vel = msg->velocity[3] * 0.035;
+    gazebo_RB_vel = msg->velocity[5] * 0.035;
+    gazebo_RF_vel = msg->velocity[7] * 0.035;
+
+    gazebo_LB_angle = msg->position[0];
+    gazebo_LF_angle = msg->position[2];
+    gazebo_RB_angle = msg->position[4];
+    gazebo_RF_angle = msg->position[6];
+}
+
+void Swerve_Odom_Publisher::processing_gazebo_data()
+{
+    static ros::Time last_time = ros::Time::now();
+    ros::Time current_time = ros::Time::now();
+    double delta = gazebo_RF_vel * (current_time - last_time).toSec();
+    wheelpos[0][0] += delta * cos(theta + gazebo_RF_angle);
+    wheelpos[0][1] += delta * sin(theta + gazebo_RF_angle);
+    delta = gazebo_LF_vel * (current_time - last_time).toSec();
+    wheelpos[1][0] += delta * cos(theta + gazebo_LF_angle);
+    wheelpos[1][1] += delta * sin(theta + gazebo_LF_angle);
+    delta = gazebo_LB_vel * (current_time - last_time).toSec();
+    wheelpos[2][0] += delta * cos(theta + gazebo_LB_angle);
+    wheelpos[2][1] += delta * sin(theta + gazebo_LB_angle);
+    delta = gazebo_RB_vel * (current_time - last_time).toSec();
+    wheelpos[3][0] += delta * cos(theta + gazebo_RB_angle);
+    wheelpos[3][1] += delta * sin(theta + gazebo_RB_angle);
     last_time = current_time;
 }
 
 void Swerve_Odom_Publisher::CalcRobotCenter()
 {
-    center_xy[0] = 0;
-    center_xy[1] = 0;
+    double center_x = 0;
+    double center_y = 0;
     for (int i = 0; i < 4; i++)
     {
-        center_xy[0] += wheelpos[i][0] / 4.0f;
-        center_xy[1] += wheelpos[i][1] / 4.0f;
+        center_x += wheelpos[i][0] / 4.0f;
+        center_y += wheelpos[i][1] / 4.0f;
     }
-}
-
-void Swerve_Odom_Publisher::CalcRobotAngle()
-{
-    // 原点に平行移動
-    float square_pos[4][2];
-    for (int i = 0; i < 4;i++){
-        square_pos[i][0] = wheelpos[i][0] - center_xy[0];
-        square_pos[i][1] = wheelpos[i][1] - center_xy[1];
-    }
-
-    int index;
-
-    // 第一象限に存在する点がただ一つ存在する
-    for (int i = 0; i < 4;i++){
-        if (square_pos[i][0] > 0 && square_pos[i][1] >= 0){
-            index = i;
-            break;
-        }
-    }
-
-    int count = 0;
-    theta = 0;
-    while(count<4){
-        float x = square_pos[index][0];
-        float y = square_pos[index][1];
-
-        if(count == 0) // 第1象限
-        {
-            theta += atan2(y, x) - 45.0f * M_PI / 180.0f;
-        }
-        else if (count == 1) // 第2象限
-        {
-            theta += atan2(y, x) - 135.0f * M_PI / 180.0f;
-        }
-        else if (count == 2) // 第3象限
-        {
-            theta += atan2(y, x) + 135.0f * M_PI / 180.0f;
-        }
-        else if (count == 3) // 第4象限
-        {
-            theta += atan2(y, x) + 45.0f * M_PI / 180.0f;
-        }
-
-        index++;
-        if(index == 4){
-            index = 0;
-        }
-        count++;
-    }
-    theta /= 4.0f;
-
-    // odom角に変換
-    // 回転
-    for (int i = 0; i < 4;i++){
-        square_pos[i][0] = square_pos[i][0] / sqrt(2) + square_pos[i][1] / sqrt(2);
-        square_pos[i][0] = -1 * square_pos[i][0] / sqrt(2) + square_pos[i][1] / sqrt(2);
-    }
-
-    if (square_pos[0][0] > 0 && square_pos[0][1] >= 0); // 第1象限
-    else if (square_pos[0][0] <= 0 && square_pos[0][1] > 0) // 第2象限
-    {
-        theta += 90.0f * M_PI / 180.0f;
-    }
-    else if (square_pos[0][0] < 0 && square_pos[0][1] <= 0) // 第3象限
-    {
-        theta -= 180.0f * M_PI / 180.0f;
-    }
-    else if (square_pos[0][0] >= 0 && square_pos[0][1] < 0) // 第4象限
-    {
-        theta -= 90.0f * M_PI / 180.0f;
-    }
+    center_xy[0] = center_x;
+    center_xy[1] = center_y;
 }
 
 void Swerve_Odom_Publisher::update()
@@ -155,8 +139,11 @@ void Swerve_Odom_Publisher::update()
 
     while (ros::ok())
     {
+        if(gazebo_mode_){
+            processing_gazebo_data();
+        }
+
         CalcRobotCenter();
-        CalcRobotAngle();
         //since all odometry is 6DOF we'll need a quaternion created from yaw
         geometry_msgs::Quaternion odom_quat = tf::createQuaternionMsgFromYaw(theta);
 
@@ -189,12 +176,44 @@ void Swerve_Odom_Publisher::update()
         //set the velocity
         static ros::Time last_time = ros::Time::now();
         current_time = ros::Time::now();
-        float delta_t = (current_time - last_time).toSec();
+        double delta_t = (current_time - last_time).toSec();
         odom.child_frame_id = base_frame_id_;
         odom.twist.twist.linear.x = (center_xy[0] - old_center_xy[0]) / delta_t;
         odom.twist.twist.linear.y = (center_xy[1] - old_center_xy[1]) / delta_t;
         odom.twist.twist.angular.z = (theta - old_theta) / delta_t;
         last_time = current_time;
+
+        ROS_INFO("%f, %f, %f", odom.twist.twist.linear.x, odom.twist.twist.linear.y, odom.twist.twist.angular.z);
+
+        odom.pose.covariance[0] = 0.001;
+        odom.pose.covariance[7] = 0.001;
+        odom.pose.covariance[14] = 1000000000000.0;
+        odom.pose.covariance[21] = 1000000000000.0;
+        odom.pose.covariance[28] = 1000000000000.0;
+
+        if (std::fabs(odom.twist.twist.angular.z) < 0.0001)
+        {
+            odom.pose.covariance[35] = 0.01;
+        }
+        else
+        {
+            odom.pose.covariance[35] = 100.0;
+        }
+
+        odom.twist.covariance[0] = 0.001;
+        odom.twist.covariance[7] = 0.001;
+        odom.twist.covariance[14] = 0.001;
+        odom.twist.covariance[21] = 1000000000000.0;
+        odom.twist.covariance[28] = 1000000000000.0;
+
+        if (std::fabs(odom.twist.twist.angular.z) < 0.0001)
+        {
+            odom.twist.covariance[35] = 0.01;
+        }
+        else
+        {
+            odom.twist.covariance[35] = 100.0;
+        }
 
         //publish the message
         odom_pub.publish(odom);
@@ -216,13 +235,15 @@ int main(int argc, char **argv)
     ros::NodeHandle arg_n("~");
 
     int looprate = 30; // Hz
-    float body_width = 0.440;
+    double body_width = 0.440;
     std::string base_frame_id = "base_link";
+    bool gazebo_mode = false;
 
     arg_n.getParam("control_frequency", looprate);
     arg_n.getParam("body_width", body_width);
     arg_n.getParam("base_frame_id", base_frame_id);
+    arg_n.getParam("gazebo_mode", gazebo_mode);
 
-    Swerve_Odom_Publisher publisher(nh, looprate, body_width, base_frame_id);
+    Swerve_Odom_Publisher publisher(nh, looprate, body_width, base_frame_id, gazebo_mode);
     return 0;
 }
