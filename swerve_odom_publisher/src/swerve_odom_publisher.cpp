@@ -178,9 +178,14 @@ void Swerve_Odom_Publisher::update()
         current_time = ros::Time::now();
         double delta_t = (current_time - last_time).toSec();
         odom.child_frame_id = base_frame_id_;
-        odom.twist.twist.linear.x = (center_xy[0] - old_center_xy[0]) / delta_t;
-        odom.twist.twist.linear.y = (center_xy[1] - old_center_xy[1]) / delta_t;
-        odom.twist.twist.angular.z = (theta - old_theta) / delta_t;
+        double vx, vy, omega;
+        vx = (center_xy[0] - old_center_xy[0]) / delta_t;
+        vy = (center_xy[1] - old_center_xy[1]) / delta_t;
+        omega = (theta - old_theta) / delta_t;
+
+        odom.twist.twist.linear.x = cos(theta) * vx + sin(theta) * vy;
+        odom.twist.twist.linear.y = -sin(theta) * vx + cos(theta) * vy;
+        odom.twist.twist.angular.z = omega;
         last_time = current_time;
 
         ROS_INFO("%f, %f, %f", odom.twist.twist.linear.x, odom.twist.twist.linear.y, odom.twist.twist.angular.z);
