@@ -1,4 +1,4 @@
-# wheelctrl_4ws
+# swerve_wheelctrl
 
 ## 概要
 
@@ -6,19 +6,40 @@ base_linkの速度指令値を**4輪ステアリング**のモデルに基づい
 
 
 
+## Launch parameters
+
+- **control_frequency** : publish frequency (default : 30[Hz])
+- **lost_time_threshold** : timeout period (default : 500[ms])
+- **body_width** : 4WSロボット(正方形)の一辺の長さ (default : 0.440[m])
+- **gazebo_mode** : gazeboでのシミュレーションをする際はtrueにする (default : false)
+
+
+
 ## Subscribed Topics
 
 - **/cmd_vel** (type : `geometry_msgs::Twist`)
-- **/pose** (type : `geometry_msgs::PoseStamped`)
 
 
 
 ## Published Topics
 
-- **/control_RF** (type : `Float32MultiArray`)
-- **/control_LF** (type : `Float32MultiArray`)
-- **/control_LB** (type : `Float32MultiArray`)
-- **/control_RB** (type : `Float32MultiArray`)
+if gazebo_mode == False:
+
+- **/control_RF** (type : `std_msgs::Float32MultiArray`)
+- **/control_LF** (type : `std_msgs::Float32MultiArray`)
+- **/control_LB** (type : `std_msgs::Float32MultiArray`)
+- **/control_RB** (type : `std_msgs::Float32MultiArray`)
+
+if gazebo_mode == True:
+
+- **/control_RF** (type : `std_msgs::Float64`)
+- **/control_LF** (type : `std_msgs::Float64`)
+- **/control_LB** (type : `std_msgs::Float64`)
+- **/control_RB** (type : `std_msgs::Float64`)
+- **/control_RF_angle** (type : `std_msgs::Float64`)
+- **/control_LF_angle** (type : `std_msgs::Float64`)
+- **/control_LB_angle** (type : `std_msgs::Float64`)
+- **/control_RB_angle** (type : `std_msgs::Float64`)
 
 <img src="https://i.imgur.com/3giWneE.png" style="zoom:50%;" />
 
@@ -37,9 +58,3 @@ pub_RF.publish(floatarray);
 ```
 
 
-
-## Launch parameters
-
-- **control_frequency** : publish frequency (default : 30[Hz])
-- **lost_time_threshold** : timeout period (default : 500[ms])
-- **body_width** : 4WSロボット(正方形)の一辺の長さ (default : 0.440[m])
