@@ -188,7 +188,7 @@ void Swerve_Odom_Publisher::update()
         odom.twist.twist.angular.z = omega;
         last_time = current_time;
 
-        ROS_INFO("%f, %f, %f", odom.twist.twist.linear.x, odom.twist.twist.linear.y, odom.twist.twist.angular.z);
+        //ROS_INFO("%f, %f, %f", odom.twist.twist.linear.x, odom.twist.twist.linear.y, odom.twist.twist.angular.z);
 
         odom.pose.covariance[0] = 0.001;
         odom.pose.covariance[7] = 0.001;
