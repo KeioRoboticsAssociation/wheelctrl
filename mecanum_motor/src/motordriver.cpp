@@ -2,7 +2,6 @@
 //dir 1が正転
 #include "motordriver.h"
 #include "mbed.h"
-#include "PID.h"
 
 Motor::Motor(PwmOut &pwm, DigitalOut &dir, double period, bool brakeable) : _pwm(pwm), _dir(dir), Period(period), Brakeable(brakeable)
 {

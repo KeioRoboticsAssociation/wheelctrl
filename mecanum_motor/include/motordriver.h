@@ -1,4 +1,3 @@
-  
 #ifndef MBED_MOTOR_H
 #define MBED_MOTOR_H
 
