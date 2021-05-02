@@ -6,13 +6,13 @@
 class Motor
 {
 public:
-    Motor(PwmOut &pwm, DigitalOut &dir, double &period);
-    void speed(double v);
+    Motor(PwmOut &pwm, DigitalOut &dir, int period);
+    void speed(float v);
 
 protected:
     PwmOut &_pwm;
     DigitalOut &_dir;
-    double &_period;
+    int &_period;
 };
 
 #endif

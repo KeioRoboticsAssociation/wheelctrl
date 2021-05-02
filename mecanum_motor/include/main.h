@@ -19,6 +19,4 @@ public:
         command_v(0) {}
 };
 
-int main();
-
 #endif
