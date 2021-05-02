@@ -50,9 +50,18 @@ void Timer_Interrupt(void){
   motor.speed(command_value);
 }
 
+void wait_switch(){
+  while (1){
+    if (switch1.read() == 1)
+    {
+      break;
+    }
+  }
+}
+
 int main()
 {
-  while (switch1);
+  wait_switch();
   encoder.startCounter();
   ticker.attach_us(&Timer_Interrupt, SUMPLING_TIME_US);
   comm.startCommunication();
