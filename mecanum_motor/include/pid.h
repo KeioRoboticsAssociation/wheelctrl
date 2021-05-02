@@ -5,8 +5,8 @@
 
 class PID {
 public:
-    PID(double &a, double &b, double &c);
-    void calc(void);
+    PID(double a, double b, double c);
+    void calc(Status &status);
 private:
     double _a, _b, _c;
     double p, i, d;

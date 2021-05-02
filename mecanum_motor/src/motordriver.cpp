@@ -6,7 +6,7 @@ dir 1が正転
 #include "main.h"
 #include "motordriver.h"
 
-Motor::Motor(PwmOut &pwm, DigitalOut &dir, double &period) : _pwm(pwm), _dir(dir), _period(period) {
+Motor::Motor(PwmOut &pwm, DigitalOut &dir, double period) : _pwm(pwm), _dir(dir), _period(period) {
     _pwm.period_us(_period);
     _pwm.pulsewidth_us(0);
 }

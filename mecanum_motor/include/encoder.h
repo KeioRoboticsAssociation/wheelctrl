@@ -1,6 +1,8 @@
 #ifndef __ENCODER_H__
 #define __ENCODER_H__
 
+class Status;
+
 class Encoder {
 public:
     Encoder(InterruptIn &enA, DigitalIn &enB);

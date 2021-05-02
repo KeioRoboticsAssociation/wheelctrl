@@ -3,7 +3,6 @@
 #include "mbedserial.h"
 #include "motordriver.h"
 #include "pid.h"
-#include "controller.h"
 #include "encoder.h"
 #include "comm.h"
 
@@ -16,7 +15,7 @@ Status status;
 // モーター
 PwmOut PWM(PA_8);
 DigitalOut PHASE(PC_11);
-Motor motor(PWM, PHASE, PERIOD, true);
+Motor motor(PWM, PHASE, PERIOD);
 
 // エンコーダ
 InterruptIn enA(PA_9);
@@ -31,10 +30,9 @@ Comm comm();
 
 int main() {
   while(switch1);
-  enA.rise(encoder.count);
-  ticker1.attach_us(&encoder.calc, SUMPLING_TIME_US);
-  ticker2.attach_us(&pid.calc, SUMPLING_TIME_US);
-  ticker3.attach_us(&motor.speed(status.command_v), SUMPLING_TIME_US);
-  ticker4.attach_us(&comm.process, COMM_TIME_US);
+  ticker1.attach_us(callback(&encoder, &Encoder::calc), SUMPLING_TIME_US);
+  ticker2.attach_us(callback(&pid, &PID::calc), SUMPLING_TIME_US);
+  ticker3.attach_us(callback(&motor, &Motor::speed(status.command_v)), SUMPLING_TIME_US);
+  ticker4.attach_us(callback(&comm, &Comm::process), COMM_TIME_US);
   while(1) wait(1);
 }

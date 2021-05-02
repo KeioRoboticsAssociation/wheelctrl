@@ -6,7 +6,7 @@
 class Motor
 {
 public:
-    Motor(PwmOut &pwm, DigitalOut &dir, double &period);
+    Motor(PwmOut &pwm, DigitalOut &dir, double period);
     void speed(double v);
 
 protected:

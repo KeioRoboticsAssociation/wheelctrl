@@ -6,6 +6,7 @@ Encoder::Encoder(InterruptIn &enA, DigitalIn &enB) : _enA(enA), _enB(enB) {
     en_count = 0;
     old_en_count = 0;
     d_en_count = 0;
+    _enA.rise(callback(this, &Encoder::count));
 }
 
 void Encoder::count(void) {
