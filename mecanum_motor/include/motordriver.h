@@ -6,16 +6,13 @@
 class Motor
 {
 public:
-    Motor(PwmOut &pwm, DigitalOut &dir, double pulse, bool brakeable);
-    void speed(double speed);
-    void stop(float duty);
+    Motor(PwmOut &pwm, DigitalOut &dir, double &period);
+    void speed(double v);
 
 protected:
     PwmOut &_pwm;
     DigitalOut &_dir;
-    double Pulse;
-    bool Brakeable; // can the motor driver break
-    int sign;       //prevents throwing the motor from full foward to full reverse and stuff melting.//まだ実装してない
+    double &_period;
 };
 
 #endif
