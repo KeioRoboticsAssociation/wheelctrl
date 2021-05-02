@@ -24,17 +24,20 @@ DigitalIn enB(PB_4);
 Encoder encoder(enA, enB);
 
 // PID
-PID pid(1, 0, 0);  // Kp, Ki, Kd
+PID pid(1, 0, 0); // Kp, Ki, Kd
 
 // シリアル通信
 Comm comm();
 
-int main() {
-  while(switch1);
-  enA.rise(encoder.count);
+int main()
+{
+  while (switch1)
+    ;
+  encoder.startCounter();
   ticker1.attach_us(&encoder.calc, SUMPLING_TIME_US);
   ticker2.attach_us(&pid.calc, SUMPLING_TIME_US);
   ticker3.attach_us(&motor.speed(status.command_v), SUMPLING_TIME_US);
   ticker4.attach_us(&comm.process, COMM_TIME_US);
-  while(1) wait(1);
+  while (1)
+    ;
 }

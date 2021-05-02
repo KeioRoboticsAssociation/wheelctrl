@@ -1,11 +1,14 @@
 #ifndef __ENCODER_H__
 #define __ENCODER_H__
 
-class Encoder {
+class Encoder
+{
 public:
     Encoder(InterruptIn &enA, DigitalIn &enB);
+    void startCounter(void);
     void count(void);
     void calc(Status &status);
+
 private:
     InterruptIn _enA;
     DigitalIn _enB;
