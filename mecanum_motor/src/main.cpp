@@ -9,7 +9,7 @@
 Serial pc(USBTX, USBRX, 115200);
 Mbedserial Ms(pc);
 InterruptIn switch1(USER_BUTTON);
-Ticker ticker1, ticker2, ticker3, ticker4;
+Ticker ticker1, ticker2;
 Status status;
 
 // モーター
@@ -30,9 +30,5 @@ Comm comm();
 
 int main() {
   while(switch1);
-  ticker1.attach_us(callback(&encoder, &Encoder::calc), SUMPLING_TIME_US);
-  ticker2.attach_us(callback(&pid, &PID::calc), SUMPLING_TIME_US);
-  ticker3.attach_us(callback(&motor, &Motor::speed(status.command_v)), SUMPLING_TIME_US);
-  ticker4.attach_us(callback(&comm, &Comm::process), COMM_TIME_US);
   while(1) wait(1);
 }

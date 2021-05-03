@@ -3,10 +3,14 @@
 #include "main.h"
 #include "mbedserial.h"
 
-Comm::Comm(){}
+Ticker ticker;
 
-static void Comm::process(Status &status, Mbedserial &Ms) {
-  status.target_speed = Ms.getfloat[0];
-  data = status.current_speed;
-  Ms.float_write(&data, 1);
+Comm::Comm(Status &status, Mbedserial &Ms) : _status(status), _Ms(Ms) {
+  ticker.attach_us(callback(this, &Comm::process));
+}
+
+static void Comm::process() {
+  _status.target_speed = _Ms.getfloat[0];
+  data = _status.current_speed;
+  _Ms.float_write(&data, 1);
 }

@@ -3,11 +3,14 @@
 #include "pid.h"
 #include "motordriver.h"
 
+Ticker ticker;
+
 PID::PID(double a, double b, double c) : _a(a), _b(b), _c(c) {
     Kp = _a;
     Ki = _b;
     Kd = _c;
     integral = 0;
+    ticker.attach_us(callback(this, &PID::calc));
 }
 
 void PID::calc(Status &status) {

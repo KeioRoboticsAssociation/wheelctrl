@@ -1,13 +1,13 @@
 #ifndef __COMM_H
 #define __COMM_H
 
-class Status;
-class Mbedserial;
+Status status;
+Mbedserial Ms;
 
-class Comm {
+class Comm{
 public:
     Comm();
-    void process(Status &status, Mbedserial &Ms);
+    void process();
 private:
     float data;
 };
