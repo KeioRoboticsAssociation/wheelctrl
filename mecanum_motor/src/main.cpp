@@ -4,6 +4,9 @@
 #include "encoder.h"
 #include "comm.h"
 
+#define EN_RESOLUTION 360
+#define WHEEL_R  0.035
+
 float target_value = 0;  // 目標値 m/s
 float current_value = 0;  // 現在値 m/s
 float command_value = 0;  // 指令値 (pwm μs)
@@ -20,8 +23,8 @@ Motor motor(PWM, PHASE, PERIOD);
 
 // エンコーダ
 InterruptIn enA(PA_9);
-DigitalIn enB(PB_4);
-Encoder encoder(enA, enB);
+InterruptIn enB(PB_4);
+Encoder encoder(enA, enB, EN_RESOLUTION);
 
 // PID
 PID pid(1.0, 0.0, 0.0); // Kp, Ki, Kd
@@ -29,10 +32,11 @@ PID pid(1.0, 0.0, 0.0); // Kp, Ki, Kd
 // シリアル通信
 Comm comm(Ms);
 
-float transform_wheel_to_encoder(float value){ return value * 60.0f / 23.0f;};
-float transform_encoder_to_wheel(float value) { return value * 23.0f / 60.0f; };
+float transform_wheel_to_encoder(float value){ return value / WHEEL_R * 60.0f / 23.0f;};// rad/s
+float transform_encoder_to_wheel(float value) { return value * WHEEL_R * 23.0f / 60.0f; };// m/s
 
 void Timer_Interrupt(void){
+  encoder.calc_speed();
   current_value = encoder.getCurrentSpeed();
   comm.AttachCurrentValue(transform_encoder_to_wheel(current_value));
   target_value = transform_wheel_to_encoder(comm.getTargetValue());
@@ -42,8 +46,7 @@ void Timer_Interrupt(void){
 
 void wait_switch(){
   while (1){
-    if (switch1.read() == 1)
-    {
+    if (switch1.read() == 1){
       break;
     }
   }
@@ -55,6 +58,5 @@ int main()
   encoder.startCounter();
   ticker.attach_us(&Timer_Interrupt, SUMPLING_TIME_US);
   comm.startCommunication();
-  while (1)
-    ;
+  while (1);
 }
