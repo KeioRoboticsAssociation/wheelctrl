@@ -1,7 +1,8 @@
 #ifndef __ENCODER_H__
 #define __ENCODER_H__
 
-#define SUMPLING_TIME_US 1000  // タイマー割り込み周期 kHzオーダーつまり1000が理想
+#include "mbed.h"
+#include "param.h"
 
 class Encoder
 {

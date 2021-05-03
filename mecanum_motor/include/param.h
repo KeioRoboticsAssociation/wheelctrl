@@ -8,15 +8,4 @@
 #define RESOLUTION 10  // エンコーダーの分解能
 #define TIRE_R  0.1  // タイヤの半径 m
 
-class Status {
-public:
-    double target_speed;  // 目標値 m/s
-    double current_speed;  // 現在値 m/s
-    double command_v;  // 指令値 (pwm μs)
-    Status() :
-        target_speed(0),
-        current_speed(0), 
-        command_v(0) {}
-};
-
 #endif

@@ -1,18 +1,8 @@
-#include <mbed.h>
-#include "main.h"
 #include "mbedserial.h"
 #include "motordriver.h"
 #include "pid.h"
-#include "controller.h"
 #include "encoder.h"
 #include "comm.h"
-
-// CONSTANT
-#define PI 3.14159265359
-#define SUMPLING_TIME_US 1000  // タイマー割り込み周期 kHzオーダーつまり1000が理想
-#define PERIOD 1000  // PWM制御のパルス幅 μs
-#define RESOLUTION 10  // エンコーダーの分解能
-#define TIRE_R  0.1  // タイヤの半径 m
 
 float target_value = 0;  // 目標値 m/s
 float current_value = 0;  // 現在値 m/s

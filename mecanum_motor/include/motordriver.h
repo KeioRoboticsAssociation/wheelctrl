@@ -2,6 +2,7 @@
 #define MBED_MOTOR_H
 
 #include "mbed.h"
+#include "param.h"
 
 class Motor
 {

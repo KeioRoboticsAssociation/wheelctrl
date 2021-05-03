@@ -2,8 +2,7 @@
 #define __PID_H
 
 #include "mbed.h"
-
-#define SUMPLING_TIME_US 1000  // タイマー割り込み周期 kHzオーダーつまり1000が理想
+#include "param.h"
 
 class PID {
 public:

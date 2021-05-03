@@ -3,8 +3,7 @@
 
 #include "mbed.h"
 #include "mbedserial.h"
-
-#define COMM_TIME_US 10000
+#include "param.h"
 
 class Comm {
 public:

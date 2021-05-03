@@ -1,5 +1,3 @@
-#include "mbed.h"
-#include "main.h"
 #include "encoder.h"
 
 Encoder::Encoder(InterruptIn &enA, DigitalIn &enB) : _enA(enA), _enB(enB)
