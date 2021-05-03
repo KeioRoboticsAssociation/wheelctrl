@@ -17,9 +17,10 @@ InterruptIn switch1(USER_BUTTON);
 Ticker ticker;
 
 // モーター
+DigitalOut GATE_DRIVER_ENABLE(PA_9);
 PwmOut PWM(PA_8);
 DigitalOut PHASE(PC_11);
-Motor motor(PWM, PHASE, PERIOD);
+Motor motor(GATE_DRIVER_ENABLE, PWM, PHASE, PERIOD);
 
 // エンコーダ
 InterruptIn enA(PA_9);
