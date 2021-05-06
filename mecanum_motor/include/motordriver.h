@@ -7,16 +7,15 @@
 class Motor
 {
 public:
-    Motor(DigitalOut &gd, PwmOut &pwm, DigitalOut &dir, int period);
+    Motor(PinName gd, PinName pwm_p, PinName pwm_n);
     mbed_error_status_t enableGateDriver(void);
     mbed_error_status_t disableGateDriver(void);
     void speed(float v);
 
 protected:
-    DigitalOut &GATE_DRIVER_ENABLE;
-    PwmOut &_pwm;
-    DigitalOut &_dir;
-    int &_period;
+    DigitalOut GATE_DRIVER_ENABLE;
+    PwmOut PWM_P;
+    PwmOut PWM_N;
 };
 
 #endif

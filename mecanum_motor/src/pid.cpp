@@ -1,10 +1,9 @@
 #include "pid.h"
 #include "param.h"
 
-PID::PID(const float &a, const float &b, const float &c) : _a(a), _b(b), _c(c) {
-    Kp = _a;
-    Ki = _b;
-    Kd = _c;
+PID::PID() {
+    p = i = d = 0;
+    d_speed[0] = d_speed[1] = 0;
     integral = 0;
     command_value = 0;
 }

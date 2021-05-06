@@ -4,9 +4,6 @@
 #include "encoder.h"
 #include "comm.h"
 
-#define EN_RESOLUTION 360
-#define WHEEL_R  0.035
-
 float target_value = 0;  // 目標値 m/s
 float current_value = 0;  // 現在値 m/s
 float command_value = 0;  // 指令値 (pwm μs)
@@ -17,18 +14,13 @@ InterruptIn switch1(USER_BUTTON);
 Ticker ticker;
 
 // モーター
-DigitalOut GATE_DRIVER_ENABLE(PA_9);
-PwmOut PWM(PA_8);
-DigitalOut PHASE(PC_11);
-Motor motor(GATE_DRIVER_ENABLE, PWM, PHASE, PERIOD);
+Motor motor(PIN_GATE_DRIVER_ENABLE, PIN_PWM_P, PIN_PWM_N);
 
 // エンコーダ
-InterruptIn enA(PA_9);
-InterruptIn enB(PB_4);
-Encoder encoder(enA, enB, EN_RESOLUTION);
+Encoder encoder(PIN_ENA, PIN_ENB);
 
 // PID
-PID pid(1.0, 0.0, 0.0); // Kp, Ki, Kd
+PID pid;
 
 // シリアル通信
 Comm comm(Ms);
@@ -57,6 +49,7 @@ int main()
 {
   wait_switch();
   encoder.startCounter();
+  motor.enableGateDriver();
   ticker.attach_us(&Timer_Interrupt, SUMPLING_TIME_US);
   comm.startCommunication();
   while (1);
