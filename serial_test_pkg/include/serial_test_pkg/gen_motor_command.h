@@ -7,9 +7,8 @@
 #include <std_msgs/Float32MultiArray.h>
 
 /***************** joystick number ********************/
-#define JOY_X 1
-#define JOY_Y 0
-#define JOY_OMEGA 3
+#define JOY_V 1
+#define JOY_THETA 3
 /******************************************************/
 
 #define PI 3.141592f

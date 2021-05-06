@@ -29,12 +29,12 @@ void GEN_MOTOR_COMMAND::joy_callback(const sensor_msgs::Joy::ConstPtr &joy_msg)
 {
     if(mode_ == "swerve")
     {
-        command_v = joy_msg->axes[JOY_X] * max_speed_;
-        command_theta = joy_msg->axes[JOY_Y] * PI;
+        command_v = joy_msg->axes[JOY_V] * max_speed_;
+        command_theta = joy_msg->axes[JOY_THETA] * PI / 2.0;
     }
     else if(mode_ == "mecanum")
     {
-        command_v = joy_msg->axes[JOY_X] * max_speed_;
+        command_v = joy_msg->axes[JOY_THETA] * max_speed_;
     }
 }
 
