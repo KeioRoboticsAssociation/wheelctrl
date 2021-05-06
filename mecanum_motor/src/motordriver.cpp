@@ -15,6 +15,10 @@ Motor::Motor(PinName gd, PinName pwm_p, PinName pwm_n):
     PWM_N.pulsewidth_us(0);
 }
 
+Motor::~Motor() {
+    GATE_DRIVER_ENABLE.write(DISABLE);
+}
+
 mbed_error_status_t Motor::enableGateDriver(void) {
     if(GATE_DRIVER_ENABLE.read() == RESET) {
         GATE_DRIVER_ENABLE.write(ENABLE);
@@ -38,18 +42,25 @@ mbed_error_status_t Motor::disableGateDriver(void)
     }
 }
 
-void Motor::speed(float v)
+mbed_error_status_t Motor::speed(float v)
 {
+    if(GATE_DRIVER_ENABLE.read() != SET) {
+        MBED_ERROR(MBED_ERROR_OPERATION_PROHIBITED, "Enable Gate Driver first");
+        return MBED_ERROR_OPERATION_PROHIBITED;
+    }
     if (v > 0){
         if(v >= PERIOD * PWM_LIMIT) v = PERIOD * PWM_LIMIT;
         PWM_P.pulsewidth_us(v);
+        PWM_N.pulsewidth_us(0);
     }
     else if(v < 0){
         if(v <= -PERIOD * PWM_LIMIT) v = -PERIOD * PWM_LIMIT;
         PWM_N.pulsewidth_us(-v);
+        PWM_P.pulsewidth_us(0);
     }
     else {
         PWM_P.pulsewidth_us(0);
         PWM_N.pulsewidth_us(0);
     }
+    return MBED_SUCCESS;
 }
