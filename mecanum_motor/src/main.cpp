@@ -37,10 +37,10 @@ void Timer_Interrupt(void){
   motor.speed(command_value);
 }
 
-void wait_switch(){
+bool wait_switch(){
   while (1){
     if (switch1.read() == 1){
-      break;
+      return true;
     }
   }
 }
@@ -52,5 +52,5 @@ int main()
   motor.enableGateDriver();
   ticker.attach_us(&Timer_Interrupt, SUMPLING_TIME_US);
   comm.startCommunication();
-  while (1);
+  while (!wait_switch());
 }

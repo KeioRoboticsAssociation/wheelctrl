@@ -7,7 +7,7 @@
 #define PERIOD 1000  // PWM制御のパルス幅 μs
 #define EN_RESOLUTION 360  // エンコーダーの分解能
 #define WHEEL_R  0.035  // タイヤの半径 m
-#define PWM_LIMIT 50
+#define PWM_LIMIT 0.5
 #define INTEGRAL_LIMIT 100  // PID制御のIの値の発散防止
 
 #define PIN_GATE_DRIVER_ENABLE PB_5

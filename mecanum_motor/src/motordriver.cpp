@@ -55,7 +55,7 @@ mbed_error_status_t Motor::speed(float v)
     }
     else if(v < 0){
         if(v <= -PERIOD * PWM_LIMIT) v = -PERIOD * PWM_LIMIT;
-        PWM_N.pulsewidth_us(-v);
+        PWM_N.pulsewidth_us(v);
         PWM_P.pulsewidth_us(0);
     }
     else {
