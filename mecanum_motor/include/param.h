@@ -12,10 +12,10 @@
 
 #define PIN_GATE_DRIVER_ENABLE PB_5
 #define PIN_PWM_P PA_10
-#define PIN_PWM_N PA_11_ALT0
+#define PIN_PWM_N PA_2
 
-#define PIN_ENA PA_8
-#define PIN_ENB PA_9
+#define PIN_ENA PA_0
+#define PIN_ENB PA_1
 
 #define Kp 1.0
 #define Ki 0.0

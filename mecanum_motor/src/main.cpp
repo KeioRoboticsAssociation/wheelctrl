@@ -12,9 +12,12 @@ Serial pc(USBTX, USBRX, 115200);
 Mbedserial Ms(pc);
 InterruptIn switch1(USER_BUTTON);
 Ticker ticker;
+Ticker ticker_comm;
+
+DigitalOut myled(LED1);
 
 // モーター
-Motor motor(PIN_GATE_DRIVER_ENABLE, PIN_PWM_P, PIN_PWM_N);
+//Motor motor(PIN_GATE_DRIVER_ENABLE, PIN_PWM_P, PIN_PWM_N);
 
 // エンコーダ
 Encoder encoder(PIN_ENA, PIN_ENB);
@@ -34,12 +37,16 @@ void Timer_Interrupt(void){
   comm.AttachCurrentValue(transform_encoder_to_wheel(current_value));
   target_value = transform_wheel_to_encoder(comm.getTargetValue());
   command_value = pid.calc_speed_command(target_value, current_value);
-  motor.speed(command_value);
+  //motor.speed(command_value);
+}
+
+void Comm_Interrupt(void){
+  comm.process();
 }
 
 bool wait_switch(){
   while (1){
-    if (switch1.read() == 1){
+    if (switch1.read() == 0){
       return true;
     }
   }
@@ -47,10 +54,13 @@ bool wait_switch(){
 
 int main()
 {
+  myled = 0;
   wait_switch();
+  myled = 1;
+  pc.printf("start\n");
   encoder.startCounter();
-  motor.enableGateDriver();
+  //motor.enableGateDriver();
   ticker.attach_us(&Timer_Interrupt, SUMPLING_TIME_US);
-  comm.startCommunication();
-  while (!wait_switch());
+  Ms.float_attach(Comm_Interrupt);
+  while (1);
 }
