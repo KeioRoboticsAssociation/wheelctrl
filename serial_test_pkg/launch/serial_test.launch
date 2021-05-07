@@ -6,7 +6,7 @@
   <!-- gen_motor_command-->
   <node pkg="serial_test_pkg" name="gen_motor_command" type="gen_motor_command" output="screen" respawn="true">
       <param name = "control_frequency" value = "30"/>
-      <param name = "mode" value = "mecanum"/> <!--swerve or mecanum-->
+      <param name = "mode" value = "swerve"/> <!--swerve or mecanum-->
       <param name = "max_speed" value = "1.0"/>
   </node>
 
