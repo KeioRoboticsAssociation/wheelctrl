@@ -13,7 +13,7 @@ public:
     float getTargetValue(void) { return _target_value; };
 
 private:
-    Mbedserial _Ms;
+    Mbedserial &_Ms;
     float _target_value;
     float _current_value[1];
 };
