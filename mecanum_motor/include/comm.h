@@ -9,15 +9,13 @@ class Comm {
 public:
     Comm(Mbedserial &Ms);
     void process(void);
-    void AttachCurrentValue(float value) { current_value = value; };
-    float getTargetValue(void) { return target_value; };
-    void startCommunication(void);
+    void AttachCurrentValue(float value) { _current_value[0] = value; };
+    float getTargetValue(void) { return _target_value; };
 
 private:
     Mbedserial _Ms;
-    Ticker ticker;
-    float target_value;
-    float current_value;
+    float _target_value;
+    float _current_value[1];
 };
 
 #endif

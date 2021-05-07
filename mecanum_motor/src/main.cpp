@@ -13,6 +13,8 @@ Mbedserial Ms(pc);
 InterruptIn switch1(USER_BUTTON);
 Ticker ticker;
 
+DigitalOut myled(LED1);
+
 // モーター
 Motor motor(PIN_GATE_DRIVER_ENABLE, PIN_PWM_P, PIN_PWM_N);
 
@@ -37,9 +39,13 @@ void Timer_Interrupt(void){
   motor.speed(command_value);
 }
 
+void Comm_Interrupt(void){
+  comm.process();
+}
+
 bool wait_switch(){
   while (1){
-    if (switch1.read() == 1){
+    if (switch1.read() == 0){
       return true;
     }
   }
@@ -47,10 +53,14 @@ bool wait_switch(){
 
 int main()
 {
+  myled = 0;
   wait_switch();
+  myled = 1;
+  pc.printf("start\n");
   encoder.startCounter();
   motor.enableGateDriver();
   ticker.attach_us(&Timer_Interrupt, SUMPLING_TIME_US);
-  comm.startCommunication();
-  while (!wait_switch());
+  Ms.float_attach(Comm_Interrupt);
+  while (!wait_switch())
+    ;
 }
