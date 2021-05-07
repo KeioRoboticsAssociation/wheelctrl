@@ -39,8 +39,8 @@ Comm comm(Ms);
 float transform_wheel_to_encoder(float value){ return value / WHEEL_R * 60.0f / 23.0f;};// rad/s
 float transform_encoder_to_wheel(float value) { return value * WHEEL_R * 23.0f / 60.0f; };// m/s
 
-float transform_table_to_encoder(float value){ return value / WHEEL_R * 60.0f / 23.0f;};// rad/s
-float transform_encoder_to_table(float value) { return value * WHEEL_R * 23.0f / 60.0f; };// m/s
+float transform_table_to_encoder(float value){ return value * 122.0f / 40.0f * 500.0f;};// rad
+float transform_encoder_to_table(float value) { return value / 122.0f * 40.0f / 500.0f; }; // rad
 
 void Timer_Interrupt_wheel(void){
   encoder_wheel.calc_speed();
@@ -108,6 +108,11 @@ int main()
   ticker_wheel.attach_us(&Timer_Interrupt_wheel, SUMPLING_TIME_US);
   ticker_table.attach_us(&Timer_Interrupt_table, SUMPLING_TIME_US);
   Ms.float_attach(Comm_Interrupt);
+  
   wait_switch2_on();
   myled = 0;
+  motor_wheel.disableGateDriver();
+  motor_table.disableGateDriver();
+  ticker_wheel.detach();
+  ticker_table.detach();
 }

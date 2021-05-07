@@ -2,7 +2,7 @@
 #define __PARAM_H__
 
 #define PI 3.14159265359
-#define SUMPLING_TIME_US 1000  // タイマー割り込み周期 kHzオーダーつまり1000が理想
+#define SUMPLING_TIME_US 10000  // タイマー割り込み周期 kHzオーダーつまり1000が理想
 #define PERIOD 1000  // PWM制御のパルス幅 μs
 #define EN_RESOLUTION 360  // エンコーダーの分解能
 #define WHEEL_R  0.035  // タイヤの半径 m
