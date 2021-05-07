@@ -10,10 +10,11 @@ float command_value = 0;  // 指令値 (pwm μs)
 
 Serial pc(USBTX, USBRX, 115200);
 Mbedserial Ms(pc);
-InterruptIn switch1(USER_BUTTON);
 Ticker ticker;
 
 DigitalOut myled(LED1);
+DigitalIn switch1(PB_7);
+DigitalIn switch2(PB_6);
 
 // モーター
 Motor motor(PIN_GATE_DRIVER_ENABLE, PIN_PWM_P, PIN_PWM_N);
@@ -43,9 +44,33 @@ void Comm_Interrupt(void){
   comm.process();
 }
 
-bool wait_switch(){
+bool wait_switch1_on(){
+  while (1){
+    if (switch1.read() == 1){
+      return true;
+    }
+  }
+}
+
+bool wait_switch1_off(){
   while (1){
     if (switch1.read() == 0){
+      return true;
+    }
+  }
+}
+
+bool wait_switch2_on(){
+  while (1){
+    if (switch2.read() == 1){
+      return true;
+    }
+  }
+}
+
+bool wait_switch2_off(){
+  while (1){
+    if (switch2.read() == 0){
       return true;
     }
   }
@@ -54,13 +79,13 @@ bool wait_switch(){
 int main()
 {
   myled = 0;
-  wait_switch();
+  wait_switch1_on();
   myled = 1;
   pc.printf("start\n");
   encoder.startCounter();
   motor.enableGateDriver();
   ticker.attach_us(&Timer_Interrupt, SUMPLING_TIME_US);
   Ms.float_attach(Comm_Interrupt);
-  while (!wait_switch())
-    ;
+  wait_switch2_on();
+  myled = 0;
 }
