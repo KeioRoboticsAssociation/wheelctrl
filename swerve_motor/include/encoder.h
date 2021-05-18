@@ -8,17 +8,18 @@
 class Encoder
 {
 public:
-    Encoder(PinName ena, PinName enb);
+    Encoder(PinName ena, PinName enb, int en_resolution);
     void startCounter(void);
     void calc_speed(void);
-    float getEncoderValue(void) { return en_count; };
+    int getEncoderValue(void) { return en_count; };
     float getCurrentSpeed(void) { return current_speed; };
 
 private:
     InterruptIn _enA;
     InterruptIn _enB;
+    int en_resolution_;
 
-    float en_count;
+    int en_count;
     float old_en_count;
     float d_en_count;
     float current_speed;

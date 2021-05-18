@@ -1,6 +1,6 @@
 #include "encoder.h"
 
-Encoder::Encoder(PinName ena, PinName enb) : _enA(ena), _enB(enb) {
+Encoder::Encoder(PinName ena, PinName enb, int en_resolution) : _enA(ena), _enB(enb), en_resolution_(en_resolution) {
     en_count = 0;
     old_en_count = 0;
     d_en_count = 0;
@@ -41,9 +41,9 @@ void Encoder::counterBfall(void)
 
 void Encoder::calc_speed()
 {
-    d_en_count = en_count - old_en_count;
+    d_en_count = (float)en_count - old_en_count;
     old_en_count = en_count;
-    current_speed = d_en_count * 360 / EN_RESOLUTION / 4 * 1000000 / SUMPLING_TIME_US * 2 * PI / 360; // rad/s
+    current_speed = d_en_count * 360.0f / (float)en_resolution_ / 4.0f * 1000000.0f / (float)SUMPLING_TIME_US * 2.0f * PI / 360.0f; // rad/s
 }
 
 

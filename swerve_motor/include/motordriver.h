@@ -7,7 +7,7 @@
 class Motor
 {
 public:
-    Motor(PinName gd, PinName pwm_p, PinName pwm_n);
+    Motor(PinName gd, PinName pwm_p, PinName pwm_n, float pwm_limit);
     ~Motor();
     mbed_error_status_t enableGateDriver(void);
     mbed_error_status_t disableGateDriver(void);
@@ -17,6 +17,7 @@ protected:
     DigitalOut GATE_DRIVER_ENABLE;
     PwmOut PWM_P;
     PwmOut PWM_N;
+    float _PWM_LIMIT;
 };
 
 #endif
