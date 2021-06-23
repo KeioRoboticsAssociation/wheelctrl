@@ -94,16 +94,22 @@ void VelConverter::cmdvel24ws_per_step(const double &vx, const double &vy, const
     for (int i=0;i<4;i++){// next - now
         deltapos[i][0] = wheelpos_next[i][0] - wheelpos_now[i][0];
         deltapos[i][1] = wheelpos_next[i][1] - wheelpos_now[i][1];
+        if(abs(deltapos[i][0]) < 1e-8) deltapos[i][0] = 0.0;
+        if(abs(deltapos[i][1]) < 1e-8) deltapos[i][1] = 0.0;
     }
 
     // calc_angle
-    static double wheel_angle[4] = {};
-    static double former_wheel_angle[4] = {};
+    static double wheel_angle[4] = {M_PI/2,M_PI/2,M_PI/2,M_PI/2};
+    static double former_wheel_angle[4] = {M_PI/2,M_PI/2,M_PI/2,M_PI/2};
     static int speed_flag[4] = {1, 1, 1, 1};
 
     for (int i = 0; i < 4; i++)
     { //pay attention
         //atan2
+        if(deltapos[i][1] == 0.0 && deltapos[1][0] == 0.0){ // zero devide process
+            wheel_angle[i] = former_wheel_angle[i];
+            break;
+        }
         wheel_angle[i] = atan2(-1*deltapos[i][0], deltapos[i][1]);
         
         //-pi2pi to -inf2inf
