@@ -45,6 +45,9 @@ VelConverter::VelConverter(ros::NodeHandle &nh, const double &body_width, const 
     cmd_vel_sub_ = nh_.subscribe("/cmd_vel", 1,
                                  &VelConverter::cmdvelCallback, this);
 
+    init_angle_sub_ = nh_.subscribe("/init_angle_flag", 1,
+                                 &VelConverter::InitAngleFlagCallback, this);
+
     last_sub_vel_time_ = std::chrono::system_clock::now();
 
     update();
@@ -60,6 +63,14 @@ void VelConverter::init_variables(){
         target_speed[i] = 0;
         target_theta[i] = 0;
     }
+}
+
+void VelConverter::InitAngleFlagCallback(const std_msgs::Empty::ConstPtr &msg){
+    for (int i = 0; i < 4; i++)
+    {
+        wheel_angle[i] = 0;
+        former_wheel_angle[i] = 0;
+    }  
 }
 
 void VelConverter::cmdvel24ws_per_step(const double &vx, const double &vy, const double &omega)
@@ -101,8 +112,6 @@ void VelConverter::cmdvel24ws_per_step(const double &vx, const double &vy, const
     }
 
     // calc_angle
-    static double wheel_angle[4] = {0,0,0,0};
-    static double former_wheel_angle[4] = {0,0,0,0};
     static int speed_flag[4] = {1, 1, 1, 1};
 
     for (int i = 0; i < 4; i++)
