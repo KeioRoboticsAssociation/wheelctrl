@@ -12,7 +12,7 @@
 class VelConverter
 {
 public:
-    VelConverter(ros::NodeHandle &nh, const double &body_width, const int &lost_time_threshold, const int &loop_rate, const bool& gazebo_mode);
+    VelConverter(ros::NodeHandle &nh, const double &body_width, const int &lost_time_threshold, const int &loop_rate, const float &initial_table_angle, const bool& gazebo_mode);
     ~VelConverter(){};
 
 private:
@@ -33,6 +33,7 @@ private:
     int loop_rate_;
     double BODY_WIDTH;
     int lost_time_threshold_;
+    float initial_table_angle_;
     bool gazebo_mode_;
 
     //variables

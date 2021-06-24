@@ -15,7 +15,7 @@
 class Swerve_Odom_Publisher
 {
 public:
-    Swerve_Odom_Publisher(ros::NodeHandle &nh, const int &loop_rate, const double &body_width, const std::string &base_farme_id, const bool &gazebo_mode);
+    Swerve_Odom_Publisher(ros::NodeHandle &nh, const int &loop_rate, const double &body_width, const std::string &base_farme_id, const float &initial_table_angle, const bool &gazebo_mode);
     ~Swerve_Odom_Publisher(){};
 
 private:
@@ -36,6 +36,7 @@ private:
     int loop_rate_;
     double BODY_WIDTH;
     std::string base_frame_id_;
+    float initial_table_angle_;
     bool gazebo_mode_;
 
     //variables

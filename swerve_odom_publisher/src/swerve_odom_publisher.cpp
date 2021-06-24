@@ -2,14 +2,17 @@
 
 std::string node_name = "swerve_odom_publisher";
 
-Swerve_Odom_Publisher::Swerve_Odom_Publisher(ros::NodeHandle &nh, const int &loop_rate, const double &body_width, const std::string &base_frame_id, const bool &gazebo_mode)
-    : nh_(nh), loop_rate_(loop_rate), BODY_WIDTH(body_width), base_frame_id_(base_frame_id), gazebo_mode_(gazebo_mode)
+Swerve_Odom_Publisher::Swerve_Odom_Publisher(ros::NodeHandle &nh, const int &loop_rate, const double &body_width, const std::string &base_frame_id, const float &initial_table_angle, const bool &gazebo_mode)
+    : nh_(nh), loop_rate_(loop_rate), BODY_WIDTH(body_width), base_frame_id_(base_frame_id), initial_table_angle_(initial_table_angle), gazebo_mode_(gazebo_mode)
 { //constructer, define pubsub
     ROS_INFO("Creating swerve_odom_publisher");
     ROS_INFO_STREAM("loop_rate [Hz]: " << loop_rate_);
     ROS_INFO_STREAM("body_width [m]: " << BODY_WIDTH);
     ROS_INFO_STREAM("base_frame_id: " << base_frame_id_);
+    ROS_INFO_STREAM("initial_table_angle [deg]: " << initial_table_angle_);
     ROS_INFO_STREAM("gazebo_mode: " << gazebo_mode_);
+
+    initial_table_angle_ *= M_PI / 180.0; // rad
 
     odom_pub = nh_.advertise<nav_msgs::Odometry>("odom", 1);
     bno_sub = nh_.subscribe("imu", 1, &Swerve_Odom_Publisher::imuCallback, this);
@@ -53,8 +56,8 @@ void Swerve_Odom_Publisher::RF_Callback(const std_msgs::Float32MultiArray::Const
     static ros::Time last_time = ros::Time::now();
     ros::Time current_time = ros::Time::now();
     double delta = msg->data[0] * (current_time - last_time).toSec();
-    wheelpos[0][0] += delta * cos(msg->data[1]);
-    wheelpos[0][1] += delta * sin(msg->data[1]);
+    wheelpos[0][0] += delta * cos(theta+msg->data[1]+initial_table_angle_);
+    wheelpos[0][1] += delta * sin(theta+msg->data[1]+initial_table_angle_);
     last_time = current_time;
 }
 
@@ -63,8 +66,8 @@ void Swerve_Odom_Publisher::LF_Callback(const std_msgs::Float32MultiArray::Const
     static ros::Time last_time = ros::Time::now();
     ros::Time current_time = ros::Time::now();
     double delta = msg->data[0] * (current_time - last_time).toSec();
-    wheelpos[1][0] += delta * cos(msg->data[1]);
-    wheelpos[1][1] += delta * sin(msg->data[1]);
+    wheelpos[1][0] += delta * cos(theta+msg->data[1]+initial_table_angle_);
+    wheelpos[1][1] += delta * sin(theta+msg->data[1]+initial_table_angle_);
     last_time = current_time;
 }
 
@@ -73,8 +76,8 @@ void Swerve_Odom_Publisher::LB_Callback(const std_msgs::Float32MultiArray::Const
     static ros::Time last_time = ros::Time::now();
     ros::Time current_time = ros::Time::now();
     double delta = msg->data[0] * (current_time - last_time).toSec();
-    wheelpos[2][0] += delta * cos(msg->data[1]);
-    wheelpos[2][1] += delta * sin(msg->data[1]);
+    wheelpos[2][0] += delta * cos(theta+msg->data[1]+initial_table_angle_);
+    wheelpos[2][1] += delta * sin(theta+msg->data[1]+initial_table_angle_);
     last_time = current_time;
 }
 
@@ -83,8 +86,8 @@ void Swerve_Odom_Publisher::RB_Callback(const std_msgs::Float32MultiArray::Const
     static ros::Time last_time = ros::Time::now();
     ros::Time current_time = ros::Time::now();
     double delta = msg->data[0] * (current_time - last_time).toSec();
-    wheelpos[3][0] += delta * cos(msg->data[1]);
-    wheelpos[3][1] += delta * sin(msg->data[1]);
+    wheelpos[3][0] += delta * cos(theta+msg->data[1]+initial_table_angle_);
+    wheelpos[3][1] += delta * sin(theta+msg->data[1]+initial_table_angle_);
     last_time = current_time;
 }
 
@@ -95,10 +98,10 @@ void Swerve_Odom_Publisher::state_gazebo_Callback(const sensor_msgs::JointState:
     gazebo_RB_vel = msg->velocity[5] * 0.035;
     gazebo_RF_vel = msg->velocity[7] * 0.035;
 
-    gazebo_LB_angle = msg->position[0];
-    gazebo_LF_angle = msg->position[2];
-    gazebo_RB_angle = msg->position[4];
-    gazebo_RF_angle = msg->position[6];
+    gazebo_LB_angle = msg->position[0]+initial_table_angle_;
+    gazebo_LF_angle = msg->position[2]+initial_table_angle_;
+    gazebo_RB_angle = msg->position[4]+initial_table_angle_;
+    gazebo_RF_angle = msg->position[6]+initial_table_angle_;
 }
 
 void Swerve_Odom_Publisher::processing_gazebo_data()
@@ -242,13 +245,15 @@ int main(int argc, char **argv)
     int looprate = 30; // Hz
     double body_width = 0.440;
     std::string base_frame_id = "base_link";
+    float initial_table_angle = 0.0;
     bool gazebo_mode = false;
 
     arg_n.getParam("control_frequency", looprate);
     arg_n.getParam("body_width", body_width);
     arg_n.getParam("base_frame_id", base_frame_id);
+    arg_n.getParam("initial_table_angle", initial_table_angle);
     arg_n.getParam("gazebo_mode", gazebo_mode);
 
-    Swerve_Odom_Publisher publisher(nh, looprate, body_width, base_frame_id, gazebo_mode);
+    Swerve_Odom_Publisher publisher(nh, looprate, body_width, base_frame_id, initial_table_angle, gazebo_mode);
     return 0;
 }

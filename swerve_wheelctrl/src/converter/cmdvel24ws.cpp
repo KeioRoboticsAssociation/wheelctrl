@@ -1,13 +1,14 @@
 #include "cmdvel24ws.h"
 #include "processings.h"
 
-VelConverter::VelConverter(ros::NodeHandle &nh, const double &body_width, const int &lost_time_threshold, const int &loop_rate, const bool &gazebo_mode) 
-: nh_(nh), BODY_WIDTH(body_width), lost_time_threshold_(lost_time_threshold), loop_rate_(loop_rate), gazebo_mode_(gazebo_mode)
+VelConverter::VelConverter(ros::NodeHandle &nh, const double &body_width, const int &lost_time_threshold, const int &loop_rate, const float &initial_table_angle, const bool &gazebo_mode) 
+: nh_(nh), BODY_WIDTH(body_width), lost_time_threshold_(lost_time_threshold), loop_rate_(loop_rate), initial_table_angle_(initial_table_angle), gazebo_mode_(gazebo_mode)
 { //constructer, define pubsub
     ROS_INFO("Creating swerve_wheelctrl");
     ROS_INFO_STREAM("body_width [m]: " << BODY_WIDTH);
     ROS_INFO_STREAM("lost_time_threshold [ms]: " << lost_time_threshold_);
     ROS_INFO_STREAM("loop_rate [Hz]: " << loop_rate_);
+    ROS_INFO_STREAM("initial_table_angle [deg]: " << initial_table_angle_);
     ROS_INFO_STREAM("gazebo_mode: " << gazebo_mode_);
 
     init_variables();
@@ -53,6 +54,7 @@ void VelConverter::init_variables(){
     vx_ = 0;
     vy_ = 0;
     omega_ = 0;
+    initial_table_angle_ *= M_PI / 180.0;
     for (int i = 0; i < 4; i++)
     {
         target_speed[i] = 0;
@@ -99,8 +101,8 @@ void VelConverter::cmdvel24ws_per_step(const double &vx, const double &vy, const
     }
 
     // calc_angle
-    static double wheel_angle[4] = {M_PI/2,M_PI/2,M_PI/2,M_PI/2};
-    static double former_wheel_angle[4] = {M_PI/2,M_PI/2,M_PI/2,M_PI/2};
+    static double wheel_angle[4] = {0,0,0,0};
+    static double former_wheel_angle[4] = {0,0,0,0};
     static int speed_flag[4] = {1, 1, 1, 1};
 
     for (int i = 0; i < 4; i++)
@@ -111,6 +113,7 @@ void VelConverter::cmdvel24ws_per_step(const double &vx, const double &vy, const
             break;
         }
         wheel_angle[i] = atan2(-1*deltapos[i][0], deltapos[i][1]);
+        wheel_angle[i] -= initial_table_angle_;
         
         //-pi2pi to -inf2inf
         processings::PI2INF(wheel_angle[i], former_wheel_angle[i]);
@@ -172,27 +175,36 @@ bool VelConverter::isSubscribed() {
 void VelConverter::publishMsg()
 {
     if(gazebo_mode_){
-        std_msgs::Float64 command;
+        static std_msgs::Float64 command_RF;
+        static std_msgs::Float64 command_RF_angle;
+        static std_msgs::Float64 command_LF;
+        static std_msgs::Float64 command_LF_angle;
+        static std_msgs::Float64 command_LB;
+        static std_msgs::Float64 command_LB_angle;
+        static std_msgs::Float64 command_RB;
+        static std_msgs::Float64 command_RB_angle;
+
         // rad/s
-        command.data = target_speed[0] / 0.035; // devide by wheel radius to convert m/s to rad/s
-        pub_RF.publish(command);
-        command.data = target_theta[0];
-        pub_RF_angle.publish(command);
+        command_RF.data = target_speed[0] / 0.035; // devide by wheel radius to convert m/s to rad/s
+        command_RF_angle.data = target_theta[0];
 
-        command.data = target_speed[1] / 0.035;
-        pub_LF.publish(command);
-        command.data = target_theta[1];
-        pub_LF_angle.publish(command);
+        command_LF.data = target_speed[1] / 0.035;
+        command_LF_angle.data = target_theta[1];
 
-        command.data = target_speed[2] / 0.035;
-        pub_LB.publish(command);
-        command.data = target_theta[2];
-        pub_LB_angle.publish(command);
+        command_LB.data = target_speed[2] / 0.035;
+        command_LB_angle.data = target_theta[2];
 
-        command.data = target_speed[3] / 0.035;
-        pub_RB.publish(command);
-        command.data = target_theta[3];
-        pub_RB_angle.publish(command);
+        command_RB.data = target_speed[3] / 0.035;
+        command_RB_angle.data = target_theta[3];
+
+        pub_RB.publish(command_RB);
+        pub_RB_angle.publish(command_RB_angle);
+        pub_RF.publish(command_RF);
+        pub_RF_angle.publish(command_RF_angle);
+        pub_LF.publish(command_LF);
+        pub_LF_angle.publish(command_LF_angle);
+        pub_LB.publish(command_LB);
+        pub_LB_angle.publish(command_LB_angle);
     }
     else{
         std_msgs::Float32MultiArray floatarray;
