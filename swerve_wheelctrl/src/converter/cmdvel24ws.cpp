@@ -107,8 +107,8 @@ void VelConverter::cmdvel24ws_per_step(const double &vx, const double &vy, const
     for (int i=0;i<4;i++){// next - now
         deltapos[i][0] = wheelpos_next[i][0] - wheelpos_now[i][0];
         deltapos[i][1] = wheelpos_next[i][1] - wheelpos_now[i][1];
-        if(abs(deltapos[i][0]) < 1e-8) deltapos[i][0] = 0.0;
-        if(abs(deltapos[i][1]) < 1e-8) deltapos[i][1] = 0.0;
+        if(abs(deltapos[i][0]) < 1e-4) deltapos[i][0] = 0.0;
+        if(abs(deltapos[i][1]) < 1e-4) deltapos[i][1] = 0.0;
     }
 
     // calc_angle
@@ -117,7 +117,7 @@ void VelConverter::cmdvel24ws_per_step(const double &vx, const double &vy, const
     for (int i = 0; i < 4; i++)
     { //pay attention
         //atan2
-        if(deltapos[i][1] == 0.0 && deltapos[1][0] == 0.0){ // zero devide process
+        if(deltapos[i][1] == 0.0 && deltapos[i][0] == 0.0){ // zero devide process
             wheel_angle[i] = former_wheel_angle[i];
             break;
         }
