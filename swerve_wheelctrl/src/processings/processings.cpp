@@ -20,51 +20,41 @@ namespace processings {
 
     void AdjustDirection(double &angle, const double &former_angle, int &speed_flag)
     {
-        if (former_angle - angle > 1e-3f)
+        if (former_angle - angle > 1e-7f)
         {
-            if (former_angle - angle < M_PI / 2.0f)
+            if (former_angle - angle < M_PI / 2.0f - 1e-7f)
             {
-                if (speed_flag == -1)
-                    speed_flag *= -1;
+                speed_flag = 1;
             }
-            else if (former_angle - angle > M_PI / 2.0f)
+            else if (former_angle - angle > M_PI / 2.0f + 1e-7f)
             {
                 angle += M_PI;
-                if (speed_flag == 1)
-                    speed_flag *= -1;
+                speed_flag = -1;
             }
             else
             {
-                if (speed_flag == 1);
-                else
-                    speed_flag *= -1;
+                speed_flag = 1;
             }
         }
-        else if (former_angle - angle < -1.0 * 1e-3f)
+        else if (former_angle - angle < -1.0 * 1e-7f)
         {
-            if (former_angle - angle > -1.0 * M_PI / 2.0f)
+            if (former_angle - angle > -1.0 * M_PI / 2.0f + 1e-7f)
             {
-                if (speed_flag == -1)
-                    speed_flag *= -1;
+                speed_flag = 1;
             }
-            else if (former_angle - angle < -1.0 * M_PI / 2.0f)
+            else if (former_angle - angle < -1.0 * M_PI / 2.0f - 1e-7f)
             {
                 angle -= M_PI;
-                if (speed_flag == 1)
-                    speed_flag *= -1;
+                speed_flag = -1;
             }
             else
             {
-                if (speed_flag == 1);
-                else
-                    speed_flag *= -1;
+                speed_flag = 1;
             }
         }
         else
         {
-            if (speed_flag == 1);
-            else
-                speed_flag *= -1;
+            speed_flag = 1;
         }
     }
 

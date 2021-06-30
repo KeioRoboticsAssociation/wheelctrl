@@ -119,7 +119,7 @@ void VelConverter::cmdvel24ws_per_step(const double &vx, const double &vy, const
         //atan2
         if(deltapos[i][1] == 0.0 && deltapos[i][0] == 0.0){ // zero devide process
             wheel_angle[i] = former_wheel_angle[i];
-            break;
+            continue;
         }
         wheel_angle[i] = atan2(-1*deltapos[i][0], deltapos[i][1]);
         wheel_angle[i] -= initial_table_angle_;
