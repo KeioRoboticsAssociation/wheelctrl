@@ -16,6 +16,7 @@ Serial pc(USBTX, USBRX, 115200);
 Mbedserial Ms(pc);
 Ticker ticker_wheel;
 Ticker ticker_table;
+Ticker ticker_send;
 
 DigitalOut myled(LED1);
 DigitalIn switch1(PB_7);
@@ -62,8 +63,12 @@ void Timer_Interrupt_table(void){
   motor_table.speed(command_value_table);
 }
 
-void Comm_Interrupt(void){
-  comm.process();
+void Timer_Interrupt_send_status(void){
+  comm.send();
+}
+
+void Comm_Recieve_Interrupt(void){
+  comm.receive();
 }
 
 bool wait_switch1_on(){
@@ -110,7 +115,8 @@ int main()
   motor_table.enableGateDriver();
   ticker_wheel.attach_us(&Timer_Interrupt_wheel, SUMPLING_TIME_US);
   ticker_table.attach_us(&Timer_Interrupt_table, SUMPLING_TIME_US);
-  Ms.float_attach(Comm_Interrupt);
+  ticker_send.attach_us(&Timer_Interrupt_send_status, SUMPLING_TIME_US);
+  Ms.float_attach(Comm_Receive_Interrupt);
 
   wait_switch2_on();
   myled = 0;

@@ -8,7 +8,8 @@
 class Comm {
 public:
     Comm(Mbedserial &Ms);
-    void process(void);
+    void receive(void);
+    void send(void);
     void AttachCurrentVelocity(float velocity) { _current_value[0] = velocity; };
     void AttachCurrentTheta(float theta) { _current_value[1] = theta; };
     float getTargetVelcity(void) { return _target_velocity; };
