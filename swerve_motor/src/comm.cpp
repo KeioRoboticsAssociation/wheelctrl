@@ -14,5 +14,9 @@ void Comm::receive() {
 }
 
 void Comm::send(){
+  /*
+  _current_value[0] = _target_velocity;
+  _current_value[1] = _target_theta;
+  */
   _Ms.float_write(_current_value, 2);
 }

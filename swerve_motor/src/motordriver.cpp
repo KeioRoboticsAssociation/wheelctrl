@@ -48,12 +48,12 @@ mbed_error_status_t Motor::speed(float v)
         MBED_ERROR(MBED_ERROR_OPERATION_PROHIBITED, "Enable Gate Driver first");
         return MBED_ERROR_OPERATION_PROHIBITED;
     }
-    if (v > 0.05){
+    if (v > 1.0){
         if(v >= PERIOD * _PWM_LIMIT) v = PERIOD * _PWM_LIMIT;
         PWM_P.pulsewidth_us(v);
         PWM_N.pulsewidth_us(0);
     }
-    else if(v < -0.05){
+    else if(v < -1.0){
         v *= -1.0;
         if(v >= PERIOD * _PWM_LIMIT) v = PERIOD * _PWM_LIMIT;
         PWM_N.pulsewidth_us(v);

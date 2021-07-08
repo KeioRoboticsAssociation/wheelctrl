@@ -6,6 +6,7 @@
 
 #define PI 3.14159265359
 #define SUMPLING_TIME_US 10000  // タイマー割り込み周期 kHzオーダーつまり1000が理想
+#define SERIAL_SUMPLING_TIME_US 30000  // タイマー割り込み周期 kHzオーダーつまり1000が理想
 #define PERIOD 1000  // PWM制御のパルス幅 μs
 
 #ifdef TR
