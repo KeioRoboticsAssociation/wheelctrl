@@ -56,7 +56,7 @@ void Timer_Interrupt_wheel(void){
 
 void Timer_Interrupt_table(void){
   current_value_table = encoder_table.getEncoderValue();
-  //pc.printf("en_count: %d\n", (int)transform_encoder_to_table((float)current_value_table));
+  //pc.printf("en_count: %d\n", current_value_table);
   comm.AttachCurrentTheta(transform_encoder_to_table((float)current_value_table));
   target_value_table = transform_table_to_encoder(comm.getTargetTheta());
   command_value_table = pid_table.calc_position_command(target_value_table, (float)current_value_table);

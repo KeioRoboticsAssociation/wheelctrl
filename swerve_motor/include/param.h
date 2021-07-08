@@ -2,7 +2,7 @@
 #define __PARAM_H__
 
 #define TR
-#define STYLE_LF
+#define STYLE_LB
 
 #define PI 3.14159265359
 #define SUMPLING_TIME_US 10000  // タイマー割り込み周期 kHzオーダーつまり1000が理想
@@ -14,14 +14,14 @@
 #define EN_RESOLUTION_TABLE 360  // エンコーダーの分解能(回転テーブル)
 #define WHEEL_R  0.035  // タイヤの半径 m
 #define PWM_LIMIT_WHEEL 0.90
-#define PWM_LIMIT_TABLE 0.30
+#define PWM_LIMIT_TABLE 0.90
 #define INTEGRAL_LIMIT 1.0  // PID制御のIの値の発散防止
 
 #define Kp_WHEEL 0.50
 #define Ki_WHEEL 0.0
 #define Kd_WHEEL 0.0
 
-#define Kp_TABLE 0.30
+#define Kp_TABLE 0.35
 #define Ki_TABLE 0.0
 #define Kd_TABLE 0.0
 
