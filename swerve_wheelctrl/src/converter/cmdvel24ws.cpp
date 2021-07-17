@@ -48,6 +48,9 @@ VelConverter::VelConverter(ros::NodeHandle &nh, const double &body_width, const 
     init_angle_sub_ = nh_.subscribe("/init_angle_flag", 1,
                                  &VelConverter::InitAngleFlagCallback, this);
 
+    init_angle_sub_ = nh_.subscribe("/emergency_stop_flag", 1,
+                                 &VelConverter::EmergencyStopFlagCallback, this);
+
     last_sub_vel_time_ = std::chrono::system_clock::now();
 
     update();
@@ -58,6 +61,7 @@ void VelConverter::init_variables(){
     vy_ = 0;
     omega_ = 0;
     initial_table_angle_ *= M_PI / 180.0;
+    emergency_stop_flag = false;
     for (int i = 0; i < 4; i++)
     {
         target_speed[i] = 0;
@@ -71,6 +75,14 @@ void VelConverter::InitAngleFlagCallback(const std_msgs::Empty::ConstPtr &msg){
         wheel_angle[i] = 0;
         former_wheel_angle[i] = 0;
     }  
+}
+
+void VelConverter::EmergencyStopFlagCallback(const std_msgs::Empty::ConstPtr &msg){
+    for (int i = 0; i < 4; i++)
+    {
+        target_speed[i] = 0;
+    }
+    emergency_stop_flag = true;  
 }
 
 void VelConverter::cmdvel24ws_per_step(const double &vx, const double &vy, const double &omega)
@@ -161,12 +173,17 @@ void VelConverter::reset(){
 
 void VelConverter::cmdvelCallback(const geometry_msgs::Twist::ConstPtr &cmd_vel)
 {
-    ROS_DEBUG("Received cmd_vel");
-    vx_ = cmd_vel->linear.x;
-    vy_ = cmd_vel->linear.y;
-    omega_ = cmd_vel->angular.z;
+    if(!emergency_stop_flag){
+        ROS_DEBUG("Received cmd_vel");
+        vx_ = cmd_vel->linear.x;
+        vy_ = cmd_vel->linear.y;
+        omega_ = cmd_vel->angular.z;
 
-    last_sub_vel_time_ = std::chrono::system_clock::now();
+        last_sub_vel_time_ = std::chrono::system_clock::now();
+    }
+    else{
+        ROS_ERROR("swerve_wheelctrl: emergency stopping...");
+    }
 }
 
 bool VelConverter::isSubscribed() {

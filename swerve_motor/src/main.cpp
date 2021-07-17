@@ -16,6 +16,7 @@ Serial pc(USBTX, USBRX, 115200);
 Mbedserial Ms(pc);
 Ticker ticker_wheel;
 Ticker ticker_table;
+Ticker ticker_send;
 
 DigitalOut myled(LED1);
 DigitalIn switch1(PB_7);
@@ -62,8 +63,15 @@ void Timer_Interrupt_table(void){
   motor_table.speed(command_value_table);
 }
 
-void Comm_Interrupt(void){
-  comm.process();
+void Timer_Interrupt_send_status(void){
+  comm.send();
+  //pc.printf("send\n");
+  //pc.printf("%d, %d \n", (int)(comm._current_value[0]*100.0), (int)(comm._current_value[1]*100.0));
+}
+
+void Comm_Receive_Interrupt(void){
+  comm.receive();
+  //comm.send();
 }
 
 bool wait_switch1_on(){
@@ -103,14 +111,15 @@ int main()
   myled = 0;
   wait_switch1_on();
   myled = 1;
-  pc.printf("start\n");
+  //pc.printf("start\n");
   encoder_wheel.startCounter();
   encoder_table.startCounter();
   motor_wheel.enableGateDriver();
   motor_table.enableGateDriver();
   ticker_wheel.attach_us(&Timer_Interrupt_wheel, SUMPLING_TIME_US);
   ticker_table.attach_us(&Timer_Interrupt_table, SUMPLING_TIME_US);
-  Ms.float_attach(Comm_Interrupt);
+  ticker_send.attach_us(&Timer_Interrupt_send_status, SERIAL_SUMPLING_TIME_US);
+  Ms.float_attach(Comm_Receive_Interrupt);
 
   wait_switch2_on();
   myled = 0;
@@ -118,4 +127,5 @@ int main()
   motor_table.disableGateDriver();
   ticker_wheel.detach();
   ticker_table.detach();
+  ticker_send.detach();
 }
