@@ -47,6 +47,7 @@ private:
     double omega_;
     double target_speed[4];
     double target_theta[4];
+    bool emergency_stop_flag;
 
     // Timers
     std::chrono::system_clock::time_point last_sub_vel_time_;
@@ -55,6 +56,7 @@ private:
     void init_variables();
     void cmdvelCallback(const geometry_msgs::Twist::ConstPtr &cmd_vel);
     void InitAngleFlagCallback(const std_msgs::Empty::ConstPtr &msg);
+    void EmergencyStopFlagCallback(const std_msgs::Empty::ConstPtr &msg);
     bool isSubscribed();
     void publishMsg();
     void cmdvel24ws_per_step(const double &vx, const double &vy, const double &omega);
